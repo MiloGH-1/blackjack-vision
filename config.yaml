@@ -1,0 +1,19 @@
+# Table rules
+decks: 6                 # 1, 2, 4, 6 or 8
+dealer_hits_soft_17: false
+double_after_split: true
+surrender: true          # late surrender allowed
+dealer_peeks: true       # dealer checks for blackjack with a 10 or A upcard
+
+# Camera: an integer webcam index (0 = laptop, 1 = usually DroidCam/Iriun phone)
+# or a stream URL such as "http://192.168.1.20:8080/video"
+camera: 0
+frame_width: 1280
+frame_height: 720
+
+# Detection
+model_path: models/cards.pt
+confidence: 0.5
+divider: 0.45            # fraction of frame height; dealer cards above, yours below
+smoothing_window: 10     # frames considered
+smoothing_min_hits: 6    # a card must appear in this many of them to count

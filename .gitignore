@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Model weights and datasets are large - keep them out of git
+models/*.pt
+datasets/
+runs/
