@@ -19,6 +19,14 @@ def test_far_apart_duplicates_stay_separate():
     assert len(cards) == 2
 
 
+def test_close_up_card_corners_merge():
+    # Measured on a photo: one ace filling much of the frame, corners 422 px
+    # apart with ~106 px corner boxes, beyond the 20%-of-diagonal limit (203 px).
+    a = Detection("AS", parse_label("AS"), (443, 92, 489, 187), 0.94)
+    b = Detection("AS", parse_label("AS"), (636, 467, 682, 563), 0.94)
+    assert len(merge_corners([a, b], max_dist=203)) == 1
+
+
 def test_different_labels_not_merged():
     cards = merge_corners([det("KS", 100, 100), det("QS", 110, 110)], max_dist=300)
     assert len(cards) == 2

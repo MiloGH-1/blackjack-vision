@@ -25,16 +25,31 @@ class TrackedCard:
     center: tuple[float, float]
 
 
+# A card's two corner indices sit about 4 corner-box diagonals apart, whatever
+# the camera distance. Close up that can exceed max_dist, so allow this too.
+CORNER_SPAN = 5.0
+
+
+def _box_diag(det: Detection) -> float:
+    x1, y1, x2, y2 = det.box
+    return math.hypot(x2 - x1, y2 - y1)
+
+
 def merge_corners(detections: list[Detection], max_dist: float) -> list[TrackedCard]:
-    """Cluster same-label detections within max_dist pixels into single cards."""
+    """Cluster same-label detections into single cards.
+
+    Detections merge when within max_dist pixels, or within CORNER_SPAN times
+    the corner box's diagonal (so large, close-up cards still merge).
+    """
     clusters: list[tuple[str, Card, list[tuple[float, float]]]] = []
     for det in sorted(detections, key=lambda d: -d.conf):
+        limit = max(max_dist, CORNER_SPAN * _box_diag(det))
         for label, _, pts in clusters:
             if label != det.label:
                 continue
             cx = sum(p[0] for p in pts) / len(pts)
             cy = sum(p[1] for p in pts) / len(pts)
-            if math.dist((cx, cy), det.center) <= max_dist:
+            if math.dist((cx, cy), det.center) <= limit:
                 pts.append(det.center)
                 break
         else:
