@@ -43,12 +43,28 @@ def test_parse_label_rejects_junk():
         parse_label("joker")
 
 
-def test_split_by_region():
+def test_split_top_bottom():
     dets = [
         (Card("6"), (500, 100)),    # dealer
         (Card("6"), (700, 600)),    # player, right
         (Card("10"), (400, 600)),   # player, left
     ]
-    dealer, player = split_by_region(dets, frame_height=720, divider=0.45)
+    dealer, player = split_by_region(dets, (720, 1280), 0.45, layout="top-bottom")
     assert [c.rank for c in dealer.cards] == ["6"]
     assert [c.rank for c in player.cards] == ["10", "6"]
+
+
+def test_split_left_right_is_default():
+    dets = [
+        (Card("9"), (200, 300)),    # dealer (left half)
+        (Card("K"), (900, 400)),    # player, further right
+        (Card("5"), (700, 500)),    # player
+    ]
+    dealer, player = split_by_region(dets, (720, 1280), 0.5)
+    assert [c.rank for c in dealer.cards] == ["9"]
+    assert [c.rank for c in player.cards] == ["5", "K"]
+
+
+def test_split_rejects_unknown_layout():
+    with pytest.raises(ValueError):
+        split_by_region([], (720, 1280), 0.5, layout="diagonal")

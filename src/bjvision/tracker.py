@@ -63,10 +63,14 @@ def merge_corners(detections: list[Detection], max_dist: float) -> list[TrackedC
 
 
 class CardTracker:
-    def __init__(self, window: int = 10, min_hits: int = 6, merge_fraction: float = 0.2):
+    def __init__(self, window: int = 10, min_hits: int = 6, merge_fraction: float = 0.2,
+                 max_copies: int | None = None):
         self.window = window
         self.min_hits = min_hits
         self.merge_fraction = merge_fraction  # of the frame diagonal
+        # A shoe of N decks holds at most N of any card, so more copies of a
+        # label than that are corners that failed to merge. None = no limit.
+        self.max_copies = max_copies
         self.history: deque[list[TrackedCard]] = deque(maxlen=window)
 
     def reset(self) -> None:
@@ -94,6 +98,8 @@ class CardTracker:
             k = 0
             while sum(1 for c in per_frame if c.get(label, 0) >= k + 1) >= self.min_hits:
                 k += 1
+            if self.max_copies is not None:
+                k = min(k, self.max_copies)
             if k == 0:
                 continue
             # take positions from the most recent frame that had k copies

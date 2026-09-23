@@ -1,5 +1,5 @@
 # Table rules
-decks: 6                 # 1, 2, 4, 6 or 8
+decks: 1                 # 1, 2, 4, 6 or 8 (also caps how many copies of a card can be seen)
 dealer_hits_soft_17: false
 double_after_split: true
 surrender: true          # late surrender allowed
@@ -15,6 +15,8 @@ frame_height: 720
 # Detection
 model_path: models/cards.pt
 confidence: 0.5
-divider: 0.45            # fraction of frame height; dealer cards above, yours below
+layout: left-right       # left-right: dealer left, you right. top-bottom: dealer above, you below
+divider: 0.5             # where the dividing line sits, as a fraction of the width (or height)
+rotate: 0                # 0, 90, 180 or 270: turn the camera picture, e.g. for a phone on its side
 smoothing_window: 10     # frames considered
 smoothing_min_hits: 6    # a card must appear in this many of them to count

@@ -7,7 +7,7 @@ Point a camera (laptop webcam or your phone) at a blackjack table and get:
 - **The dealer's outcome distribution**: bust %, and the chance of finishing on 17, 18, 19, 20 or 21.
 - **The expected value** of each move, plus a Hi-Lo running and true count.
 
-The dealer's cards go **above** the on-screen line and yours go **below** it.
+The dealer's cards go **left** of the on-screen line and yours go **right** of it. Set `layout: top-bottom` in `config.yaml`, or press `L`, for dealer above and you below.
 
 > For learning and practice. Using a device to help you play in a real casino is illegal in many places.
 
@@ -67,7 +67,7 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 A bare IP means DroidCam's `http://<ip>:4747/video`. For other apps, give the port or the full URL, e.g. `192.168.1.20:8080` for **IP Webcam** (Android).
 
 Tips:
-- Mount the phone above the table looking down, with the dealer's cards at the top of the picture.
+- Fix the phone in place rather than holding it: prop it up facing a wall, or on a stand, with the dealer's cards on the left of the picture and yours on the right. If the picture comes out sideways, press `O` to rotate it, then set `rotate:` in `config.yaml` to keep it.
 - Keep the phone app open and the screen on. If the stream drops, the window shows "Waiting for camera..." and reconnects on its own.
 - Windows may ask whether Python can use the network the first time. Allow it on private networks.
 - Only one program can read the phone's stream at a time. Close the browser tab after checking.
@@ -93,7 +93,10 @@ python -m bjvision --camera 1      # override the camera
 | `R` | surrender on/off |
 | `N` | new shoe (forget the cards already played) |
 | `Space` | freeze the frame |
-| `↑` / `↓` or `[` / `]` | move the dealer/player divider |
+| `P` | save a snapshot (frame + detections) to `snapshots/`, for checking misreads |
+| `[` / `]` or arrow keys | move the dealer/player divider |
+| `L` | swap layout: dealer left / you right, or dealer above / you below |
+| `O` | rotate the camera picture 90° (for a phone on its side) |
 | `Q` / `Esc` | quit |
 
 When the table has been clear for about 2 seconds, the round's cards count as played. They're removed from the shoe for the odds and added to the count.

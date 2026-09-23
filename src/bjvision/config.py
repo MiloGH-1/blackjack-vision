@@ -19,7 +19,9 @@ DEFAULTS = {
     "frame_height": 720,
     "model_path": "models/cards.pt",
     "confidence": 0.5,
-    "divider": 0.45,
+    "layout": "left-right",
+    "divider": 0.5,
+    "rotate": 0,
     "smoothing_window": 10,
     "smoothing_min_hits": 6,
 }

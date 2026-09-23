@@ -43,6 +43,18 @@ def test_flicker_is_smoothed():
     assert [c.label for c in out] == ["7H"]
 
 
+def test_unmerged_corners_capped_by_deck_count():
+    # Two far-apart KS detections: two cards in a 6-deck shoe, but only one
+    # can exist in a single deck, so it's one card whose corners didn't merge.
+    shape = (720, 1280, 3)
+    frame = [det("KS", 100, 100), det("KS", 1100, 600)]
+    for max_copies, expected in ((None, 2), (6, 2), (1, 1)):
+        tr = CardTracker(window=10, min_hits=6, max_copies=max_copies)
+        for _ in range(6):
+            out = tr.update(frame, shape)
+        assert len(out) == expected
+
+
 def test_one_off_misdetection_ignored():
     tr = CardTracker(window=10, min_hits=6)
     shape = (720, 1280, 3)

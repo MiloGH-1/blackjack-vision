@@ -56,12 +56,22 @@ class Hand:
         return " ".join(str(c) for c in self.cards)
 
 
-def split_by_region(detections, frame_height: int, divider: float):
-    """Split (card, (cx, cy)) pairs into dealer (above divider) and player (below).
+LAYOUTS = ("left-right", "top-bottom")
 
-    Cards are ordered left-to-right within each hand.
+
+def split_by_region(detections, frame_size: tuple[int, int], divider: float,
+                    layout: str = "left-right"):
+    """Split (card, (cx, cy)) pairs into dealer and player hands.
+
+    frame_size is (height, width). divider is a fraction of the frame width
+    ("left-right": dealer left, player right) or height ("top-bottom": dealer
+    above, player below). Cards are ordered left-to-right, then top-to-bottom.
     """
-    line = frame_height * divider
-    dealer = sorted((d for d in detections if d[1][1] < line), key=lambda d: d[1][0])
-    player = sorted((d for d in detections if d[1][1] >= line), key=lambda d: d[1][0])
+    if layout not in LAYOUTS:
+        raise ValueError(f"layout must be one of {LAYOUTS}, not {layout!r}")
+    axis = 0 if layout == "left-right" else 1       # x or y coordinate
+    line = frame_size[1 - axis] * divider
+    order = lambda d: (d[1][0], d[1][1])  # noqa: E731
+    dealer = sorted((d for d in detections if d[1][axis] < line), key=order)
+    player = sorted((d for d in detections if d[1][axis] >= line), key=order)
     return Hand([d[0] for d in dealer]), Hand([d[0] for d in player])
