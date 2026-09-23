@@ -20,7 +20,8 @@ python -m bjvision.cli --player A 7 --dealer 9 --decks 2 --h17 --seen 2 3 4   # 
 python -m bjvision [--camera 1] [--model path.pt] [--config config.yaml]      # live app
 python scripts/train.py --data datasets/playing-cards/data.yaml --epochs 50   # writes models/cards.pt
 python scripts/detect_image.py photo.jpg --show
-python scripts/test_camera.py --source 1
+python scripts/test_camera.py --scan            # list working webcam indices
+python scripts/test_camera.py --source 192.168.1.20   # phone running DroidCam over Wi-Fi
 ```
 
 pytest's `pythonpath = ["src"]` setting means tests run without an install. Scripts add `src/` to `sys.path` themselves. No linter or formatter is configured.
@@ -43,6 +44,7 @@ Camera (threaded) → CardDetector (YOLO) → CardTracker → hands.split_by_reg
 - **Probability (`probability.py`).** `_dealer` is an exact finite-shoe recursion memoised with `lru_cache` (args must stay hashable, which is why counts are tuples). `dealer_outcomes` conditions on no dealer blackjack when `peeks` is on and the upcard is 10/A. `move_evs` uses a fixed dealer distribution; it isn't recomputed after player draws, an approximation that's documented in the code. Split EV isn't computed.
 - **Tracker (`tracker.py`).** Card datasets label corner indices, so one physical card yields about 2 detections. `merge_corners` clusters same-label detections within `merge_fraction` × frame diagonal. `stable()` supports duplicate labels (multi-deck), keeping k copies of a label if at least `min_hits` of the last `window` frames showed at least k copies.
 - **Dealer/player split** is purely positional. Cards above `divider` (a fraction of frame height) belong to the dealer, cards below belong to the player, and each hand is sorted left to right. Advice is only produced when exactly one dealer card is visible. Only one player hand is supported.
+- **Camera sources (`camera.py`).** `parse_source` normalises the config/CLI value: digits become a webcam index, and a bare IP or `host:port` becomes `http://…/video` (the default port is DroidCam's 4747). Streams open via FFMPEG with a 5 s timeout, and the capture thread reopens them after 3 s without frames. `read()` returns `None` when frames are stale, and the live app then shows `overlay.draw_waiting`. Webcam indices try DSHOW first and fall back to the default backend.
 - **Config.** `config.py` merges `config.yaml` over `DEFAULTS`. `rules_from` builds the frozen `Rules` dataclass. The live app changes rules at runtime with `dataclasses.replace`.
 
 ## Tests

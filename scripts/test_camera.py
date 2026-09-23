@@ -1,8 +1,9 @@
 """Check a camera source works. Press Q to quit.
 
-    python scripts/test_camera.py --source 0          # laptop webcam
-    python scripts/test_camera.py --source 1          # phone via DroidCam / Iriun
-    python scripts/test_camera.py --source http://192.168.1.20:8080/video
+    python scripts/test_camera.py --scan                  # list working webcam indices
+    python scripts/test_camera.py --source 0              # laptop webcam
+    python scripts/test_camera.py --source 192.168.1.20   # phone running DroidCam over Wi-Fi
+    python scripts/test_camera.py --source http://192.168.1.20:8080/video   # e.g. IP Webcam
 """
 
 import argparse
@@ -13,16 +14,29 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import cv2  # noqa: E402
 
-from bjvision.camera import Camera  # noqa: E402
+from bjvision.camera import Camera, find_cameras, parse_source  # noqa: E402
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--source", default="0")
+    ap.add_argument("--source", default="0", help="webcam index, phone IP or stream URL")
+    ap.add_argument("--scan", action="store_true", help="list working webcam indices and exit")
     args = ap.parse_args()
 
-    cam = Camera(args.source)
-    print(f"Opened {args.source!r}. Press Q in the window to quit.")
+    if args.scan:
+        found = find_cameras()
+        if not found:
+            print("No webcams found.")
+        for i, (w, h) in found:
+            print(f"  camera {i}: {w}x{h}")
+        return
+
+    print(f"Opening {parse_source(args.source)!r} ...")
+    try:
+        cam = Camera(args.source)
+    except RuntimeError as e:
+        sys.exit(f"Error: {e}")
+    print("Opened. Press Q in the window to quit.")
     try:
         while True:
             frame = cam.read()

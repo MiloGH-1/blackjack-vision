@@ -14,7 +14,7 @@ from .camera import Camera
 from .config import load_config, rules_from
 from .detector import CardDetector
 from .hands import split_by_region
-from .overlay import compose, draw_frame, draw_panel
+from .overlay import compose, draw_frame, draw_panel, draw_waiting
 from .shoe import Shoe
 from .tracker import CardTracker
 
@@ -49,7 +49,13 @@ def main(argv=None) -> int:
               file=sys.stderr)
         return 1
 
-    camera = Camera(cfg["camera"], cfg["frame_width"], cfg["frame_height"])
+    try:
+        camera = Camera(cfg["camera"], cfg["frame_width"], cfg["frame_height"])
+    except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        print("Phone setup: see 'Using your phone as the camera' in README.md",
+              file=sys.stderr)
+        return 1
     tracker = CardTracker(cfg["smoothing_window"], cfg["smoothing_min_hits"])
     shoe = Shoe(rules.decks)
     divider = float(cfg["divider"])
@@ -66,7 +72,9 @@ def main(argv=None) -> int:
             if not frozen:
                 frame = camera.read()
                 if frame is None:
-                    if cv2.waitKey(10) & 0xFF == ord("q"):
+                    cv2.imshow(WINDOW, draw_waiting(cfg["frame_width"], cfg["frame_height"],
+                                                    camera.source))
+                    if cv2.waitKey(30) & 0xFF in (ord("q"), 27):
                         break
                     continue
                 last_frame = frame

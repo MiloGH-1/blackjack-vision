@@ -52,15 +52,31 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
 ## Using your phone as the camera
 
-- **Easiest:** install **DroidCam** or **Iriun Webcam** on the phone and the laptop. The phone then shows up as an ordinary webcam, usually index `1`.
-- **Or:** use an IP-camera app (e.g. "IP Webcam" on Android) and use its stream URL.
+**Recommended: DroidCam over Wi-Fi (Android or iPhone, nothing to install on the laptop)**
 
+1. Install **DroidCam** from the Play Store / App Store and open it. Allow camera access.
+2. Put the phone and laptop on the **same Wi-Fi network** (not a guest network, which often blocks devices from seeing each other).
+3. The app shows a **WiFi IP**, e.g. `192.168.1.20`. Optional check: open `http://192.168.1.20:4747/video` in a browser on the laptop. You should see the video.
+4. Test it, then run the app with that address:
+   ```powershell
+   python scripts/test_camera.py --source 192.168.1.20
+   python -m bjvision --camera 192.168.1.20
+   ```
+   Or set `camera: "192.168.1.20"` in `config.yaml`.
+
+A bare IP means DroidCam's `http://<ip>:4747/video`. For other apps, give the port or the full URL, e.g. `192.168.1.20:8080` for **IP Webcam** (Android).
+
+Tips:
+- Mount the phone above the table looking down, with the dealer's cards at the top of the picture.
+- Keep the phone app open and the screen on. If the stream drops, the window shows "Waiting for camera..." and reconnects on its own.
+- Windows may ask whether Python can use the network the first time. Allow it on private networks.
+- Only one program can read the phone's stream at a time. Close the browser tab after checking.
+
+**Alternative: as a USB/virtual webcam.** Install **DroidCam Client** or **Iriun Webcam** on the laptop as well. The phone then shows up as a normal webcam. Find its index with:
 ```powershell
-python scripts/test_camera.py --source 1
-python scripts/test_camera.py --source http://192.168.1.20:8080/video
+python scripts/test_camera.py --scan
+python -m bjvision --camera 1
 ```
-
-Set the one that works as `camera:` in `config.yaml`.
 
 ## Run it
 

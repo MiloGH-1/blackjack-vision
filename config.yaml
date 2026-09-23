@@ -5,8 +5,9 @@ double_after_split: true
 surrender: true          # late surrender allowed
 dealer_peeks: true       # dealer checks for blackjack with a 10 or A upcard
 
-# Camera: an integer webcam index (0 = laptop, 1 = usually DroidCam/Iriun phone)
-# or a stream URL such as "http://192.168.1.20:8080/video"
+# Camera: an integer webcam index (0 = laptop, 1 = usually DroidCam/Iriun phone),
+# a phone's Wi-Fi IP running DroidCam, e.g. "192.168.1.20" (-> http://...:4747/video),
+# or any stream URL such as "http://192.168.1.20:8080/video"
 camera: 0
 frame_width: 1280
 frame_height: 720

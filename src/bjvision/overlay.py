@@ -80,6 +80,16 @@ def draw_panel(height: int, analysis: Analysis, rules: Rules) -> np.ndarray:
     return panel
 
 
+def draw_waiting(width: int, height: int, source) -> np.ndarray:
+    """Placeholder while the camera (e.g. a phone over Wi-Fi) connects or reconnects."""
+    img = np.full((height, width, 3), 30, dtype=np.uint8)
+    cv2.putText(img, "Waiting for camera...", (40, height // 2 - 20), FONT, 1.2,
+                (230, 230, 230), 2)
+    cv2.putText(img, str(source), (40, height // 2 + 25), FONT, 0.7, (150, 200, 255), 1)
+    cv2.putText(img, "[Q] quit", (40, height // 2 + 65), FONT, 0.6, (150, 150, 150), 1)
+    return img
+
+
 def compose(frame, panel):
     return np.hstack([frame, panel])
 
